@@ -1,0 +1,73 @@
+name: smart_child_hub
+description: "Smart Child Hub - Smart Child Daily Activity Tracking System"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.2
+  intl: ^0.20.2
+  fl_chart: ^1.1.1
+  flutter_svg: ^2.0.17
+  http: ^1.2.2
+  shared_preferences: ^2.3.2
+  image_picker: ^1.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  integration_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icons/
+    - assets/images/
+
+  fonts:
+    - family: Baloo2
+      fonts:
+        - asset: assets/fonts/Baloo_2-400.ttf
+          weight: 400
+        - asset: assets/fonts/Baloo_2-500.ttf
+          weight: 500
+        - asset: assets/fonts/Baloo_2-600.ttf
+          weight: 600
+        - asset: assets/fonts/Baloo_2-700.ttf
+          weight: 700
+        - asset: assets/fonts/Baloo_2-800.ttf
+          weight: 800
+    - family: Quicksand
+      fonts:
+        - asset: assets/fonts/Quicksand-400.ttf
+          weight: 400
+        - asset: assets/fonts/Quicksand-500.ttf
+          weight: 500
+        - asset: assets/fonts/Quicksand-600.ttf
+          weight: 600
+        - asset: assets/fonts/Quicksand-700.ttf
+          weight: 700
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-400.ttf
+          weight: 400
+        - asset: assets/fonts/Nunito-500.ttf
+          weight: 500
+        - asset: assets/fonts/Nunito-600.ttf
+          weight: 600
+        - asset: assets/fonts/Nunito-700.ttf
+          weight: 700
+        - asset: assets/fonts/Nunito-800.ttf
+          weight: 800

@@ -1,0 +1,79 @@
+# Child photo storage.
+#
+# Apache serves this directory directly: public/.htaccess only rewrites
+# requests whose target is NOT an existing file, so index.php's upload-serving
+# branch never runs here. Every response control therefore has to be declared
+# in this file, because it is the layer Apache actually applies.
+#
+# The API only writes jpg/png/webp and derives the extension from the verified
+# content type, so those three are the only servable formats.
+#
+# Every optional directive below is wrapped in <IfModule> on purpose. Shared
+# hosts differ wildly in what they enable (mod_php vs PHP-FPM/CGI, mod_mime,
+# mod_headers) and which directives their vhost allows to be overridden. An
+# unguarded php_flag / Options / ForceType makes Apache answer 500 for the whole
+# directory, which breaks photo loading on a perfectly capable host.
+
+<IfModule mod_headers.c>
+    # Stop a browser from re-interpreting an image as HTML or SVG.
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; sandbox"
+    Header always set Cache-Control "private, max-age=86400"
+</IfModule>
+
+# Default: nothing in this directory is servable. This covers dotfiles such as
+# .htaccess and .env, scripts, and anything else that finds its way in.
+#
+# Authorization runs before Apache selects a handler, so a denied .php/.cgi
+# file is never executed and a directory request returns 403 instead of a
+# listing. That makes "Options -Indexes -ExecCGI" unnecessary: `Options` is
+# rejected outright unless the vhost sets AllowOverride Options/All, which is a
+# very common source of 500 errors on shared hosting.
+<IfModule mod_authz_core.c>
+    Require all denied
+
+    # ...except the three formats the upload handler can produce. Pinning the
+    # Content-Type here means a file can never be announced as HTML or SVG.
+    <FilesMatch "\.(?i:jpg|jpeg|png|webp)$">
+        Require all granted
+    </FilesMatch>
+</IfModule>
+
+# Apache 2.2 hosts have no mod_authz_core; keep the same policy for them.
+<IfModule !mod_authz_core.c>
+    <IfModule mod_authz_host.c>
+        Order deny,allow
+        Deny from all
+        <FilesMatch "\.(?i:jpg|jpeg|png|webp)$">
+            Allow from all
+        </FilesMatch>
+    </IfModule>
+</IfModule>
+
+<IfModule mod_mime.c>
+    <FilesMatch "\.(?i:jpg|jpeg)$">
+        ForceType image/jpeg
+    </FilesMatch>
+    <FilesMatch "\.(?i:png)$">
+        ForceType image/png
+    </FilesMatch>
+    <FilesMatch "\.(?i:webp)$">
+        ForceType image/webp
+    </FilesMatch>
+
+    RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phps .pl .py .cgi .asp .jsp
+    RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phps
+</IfModule>
+
+# Defence in depth for mod_php hosts. Skipped automatically on PHP-FPM/CGI,
+# where php_flag is not permitted in .htaccess at all. The deny rules above
+# already prevent execution on those hosts.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>

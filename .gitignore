@@ -1,0 +1,93 @@
+# =====================================================================
+# Smart Child Hub - root .gitignore
+# Keeps secrets, local config and generated files out of the repository.
+# =====================================================================
+
+# ---------------------------------------------------------------------
+# Environment files (real values live here - NEVER commit them)
+# ---------------------------------------------------------------------
+.env
+.env.*
+*.env
+!*.env.example
+!*.env.*.example
+app/config/production.env
+config/*.local.env
+
+# ---------------------------------------------------------------------
+# Credentials, signing keys, certificates
+# ---------------------------------------------------------------------
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+key.properties
+local.properties
+secrets/
+credentials*.json
+service-account*.json
+google-services.json
+GoogleService-Info.plist
+
+# ---------------------------------------------------------------------
+# Local IDE / editor configuration
+# ---------------------------------------------------------------------
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+
+# ---------------------------------------------------------------------
+# OS generated files
+# ---------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------------------------------------------------------------------
+# Logs
+# ---------------------------------------------------------------------
+*.log
+logs/
+
+# ---------------------------------------------------------------------
+# Dependencies and caches (vendor / node / python)
+# ---------------------------------------------------------------------
+vendor/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# ---------------------------------------------------------------------
+# Flutter / Dart generated files and build output
+# ---------------------------------------------------------------------
+app/build/
+app/.dart_tool/
+app/.pub-cache/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+**/Generated.xcconfig
+**/flutter_export_environment.sh
+**/ephemeral/
+**/GeneratedPluginRegistrant.*
+**/.gradle/
+coverage/
+
+# ---------------------------------------------------------------------
+# Runtime uploads (user-generated content, not source code)
+# ---------------------------------------------------------------------
+backend/public/uploads/*
+!backend/public/uploads/.htaccess
+
+# ---------------------------------------------------------------------
+# Packaged source bundle: it embeds the Android signing keystore and
+# key.properties, so it must never be pushed.
+# ---------------------------------------------------------------------
+deliverables/06-Source-Code/*.zip

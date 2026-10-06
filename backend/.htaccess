@@ -1,0 +1,5 @@
+# Protect backend source files but allow /public to serve through its own .htaccess.
+Options -Indexes
+<FilesMatch "\.(sql|env|md|log)$">
+    Require all denied
+</FilesMatch>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Child Hub — Presentation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", Arial, sans-serif; background: #0f172a; color: #e2e8f0; }
+  .deck { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+  .slide {
+    position: absolute; inset: 0; padding: 8vh 8vw;
+    display: none; flex-direction: column; justify-content: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+  .slide.active { display: flex; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  h1 { font-size: clamp(2rem, 6vw, 4rem); color: #38bdf8; margin-bottom: .4em; }
+  h2 { font-size: clamp(1.4rem, 3.5vw, 2.4rem); color: #38bdf8; margin-bottom: .6em; }
+  li, p { font-size: clamp(1rem, 2.2vw, 1.5rem); line-height: 1.7; }
+  ul { padding-left: 1.4em; }
+  pre { background: #0b1220; border: 1px solid #334155; border-radius: 8px; padding: 1em;
+        font-size: clamp(.8rem, 1.6vw, 1.1rem); overflow: auto; }
+  table { border-collapse: collapse; font-size: clamp(.8rem, 1.7vw, 1.2rem); }
+  th, td { border: 1px solid #334155; padding: .5em .8em; text-align: left; }
+  th { background: #1e293b; color: #38bdf8; }
+  .controls { position: fixed; bottom: 16px; right: 16px; z-index: 10; display: flex; gap: 8px; }
+  .controls button { background: #38bdf8; color: #0f172a; border: none; border-radius: 8px;
+    padding: 10px 18px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+  .controls button:hover { background: #7dd3fc; }
+  #page { position: fixed; bottom: 22px; left: 20px; z-index: 10; font-size: .9rem; color: #94a3b8; }
+</style>
+</head>
+<body>
+<div class="controls">
+  <button onclick="nav(-1)">&larr; Prev</button>
+  <button onclick="nav(1)">Next &rarr;</button>
+</div>
+<div id="page"></div>
+<div class="deck" id="deck">
+
+<div class="slide"><h1>Smart Child Hub</h1><p><strong>Smart Child Daily Activity Tracking System</strong></p><p>A family app for tracking, rewarding and reviewing children's daily routines.</p><p>Phase 7 · Final Delivery · Version 1.0</p></div>
+
+<div class="slide"><h2>The Problem</h2><p>Parents juggling work and family struggle to keep track of:</p><ul><li>Daily routines (homework, chores, hygiene, meals)</li><li>Sleep, water intake and screen time</li><li>School attendance and mood</li><li>What the day actually looked like at a glance</li></ul><p><em>Result:</em> missed routines, forgotten assignments, no visibility or history.</p></div>
+
+<div class="slide"><h2>The Solution</h2><p>One app for the whole family:</p><ul><li><strong>Parents</strong> manage child profiles, assign tasks with <strong>coin rewards</strong> and streaks</li><li><strong>Kids mode</strong> lets children pick their own profile and log their own day</li><li><strong>Daily / weekly / monthly reports</strong> with charts</li><li><strong>Notifications</strong> for reminders and milestones</li></ul><p>Two modes, one family.</p></div>
+
+<div class="slide"><h2>Features</h2><ul><li>Routine <strong>activities</strong> with coin-based gamification</li><li><strong>Sleep</strong> bedtime/wake/duration/quality logging</li><li><strong>Meals</strong>, <strong>water goals</strong>, <strong>mood check-ins</strong></li><li><strong>Homework</strong> assignments with completion progress</li><li><strong>School attendance</strong> (present / late / absent)</li><li><strong>Screen time</strong> allowance vs. usage</li><li>Rich <strong>reports</strong> and <strong>notifications</strong></li></ul></div>
+
+<div class="slide"><h2>Architecture</h2><pre>Flutter App (Android)  ◄── HTTPS/JSON + Bearer ──►  PHP 8 REST API
+      Provider state                                    Controllers / Models
+      repositories / ApiClient                                 │
+                                                          PDO prepared stmts
+                                                               │
+   └──────────────►  MariaDB · 15 tables · FKs  ◄─────────────┘</pre><p>Clean two-tier: stateless API + relational persistence.</p></div>
+
+<div class="slide"><h2>Tech Stack</h2><table><tr><th>Layer</th><th>Technology</th></tr><tr><td>Client</td><td>Flutter 3.38 · Dart 3.10 · Provider state management</td></tr><tr><td>API</td><td>PHP 8 · MVC front controller · PDO prepared statements</td></tr><tr><td>Database</td><td>MariaDB / MySQL · InnoDB · 15 tables with cascades</td></tr><tr><td>Auth</td><td>bcrypt passwords · SHA-256-hashed bearer tokens (30-day TTL)</td></tr><tr><td>Security</td><td>SQLi-safe · XSS-escaped · rate-limited · ownership checks</td></tr></table></div>
+
+<div class="slide"><h2>Database Design</h2><p>15 tables covering every domain:</p><ul><li><code>parents</code>, <code>children</code>, <code>child_activities</code></li><li><code>sleep_records</code>, <code>meals</code>, <code>water_intake</code>, <code>moods</code></li><li><code>homework</code>, <code>attendance</code>, <code>screen_time</code></li><li><code>notifications</code>, <code>reports</code> and supporting tables</li></ul><p><strong>Upsert keys</strong> (child + date) keep one record per domain per day; <strong>cascading deletes</strong> keep the family tree clean.</p></div>
+
+<div class="slide"><h2>Security</h2><ul><li>Passwords stored with <strong>bcrypt</strong></li><li>Auth tokens stored <strong>hashed</strong> (SHA-256), never in plaintext</li><li><strong>Ownership enforcement</strong> — a parent can only read their own children</li><li>Validation (422) · auth (401) · not-found (404) · conflict (409)</li><li>Rate limiting on auth endpoints</li><li>SQL-injection and XSS-escape tests in the QA suite</li></ul></div>
+
+<div class="slide"><h2>Testing — All Green</h2><table><tr><th>Suite</th><th>Scope</th><th>Result</th></tr><tr><td><code>flutter analyze</code></td><td>Static analysis</td><td>0 issues</td></tr><tr><td><code>flutter test</code></td><td>Widget tests</td><td>1 / 1</td></tr><tr><td>Integration tests</td><td>E2E emulator vs live API</td><td>2 / 2</td></tr><tr><td>API tests</td><td>19 sections, live HTTP</td><td>153 / 153</td></tr><tr><td>DB tests</td><td>Schema, FKs, CRUD, cascades</td><td>127 / 127</td></tr><tr><td>Screenshot drive</td><td>10-screen capture</td><td>1 / 1</td></tr></table></div>
+
+<div class="slide"><h2>Defects Caught &amp; Fixed</h2><table><tr><th>Defect</th><th>Fix</th></tr><tr><td>Registration always failed</td><td>camelCase → <code>password_confirmation</code></td></tr><tr><td>Dashboard RenderFlex overflow</td><td>Replaced <code>Spacer()</code> with fixed spacing</td></tr><tr><td>Emulator couldn't reach API</td><td>Bind to IPv4 <code>127.0.0.1</code>, not IPv6</td></tr><tr><td>Integration tests interfered</td><td>Explicit session reset between tests</td></tr></table><p>All verified by re-running the affected suites.</p></div>
+
+<div class="slide"><h2>Release Artifacts</h2><ul><li><strong>Signed release APK</strong> (52.8 MB, signature scheme v2)</li><li><strong>Database dump</strong> (<code>smart_child_hub.sql</code>)</li><li><strong>Full documentation</strong> — technical, user manual, testing report, deployment guide, API reference</li><li><strong>10 screenshots</strong> captured on a real emulator</li><li><strong>Source code</strong> archive</li></ul></div>
+
+<div class="slide"><h2>Live Demo Flow</h2><ol><li>Onboarding → register / login (<code>dana@example.com</code> / <code>123456</code>)</li><li>Add a child profile</li><li>Complete a routine activity → coins + streak update</li><li>Log sleep / meals / water / mood</li><li>Open the daily report with charts</li><li>Check notifications</li><li>Switch to kids mode and back</li></ol></div>
+
+<div class="slide"><h2>Deployment</h2><pre>mysql -u root &lt; backend/database/schema.sql
+php backend/database/seed.php
+php -S 127.0.0.1:8080 -t backend/public backend/public/index.php</pre><p>Android emulators reach the host via <code>10.0.2.2</code>; rebuild the APK with <code>--dart-define=API_BASE_URL=http://10.0.2.2:8080</code>.</p></div>
+
+<div class="slide"><h2>Future Work</h2><ul><li>Push notifications (FCM) instead of in-app polling</li><li>Offline-first sync for kids mode</li><li>Multi-language support</li><li>Wearable / smartwatch sleep tracking</li><li>Parent web dashboard</li></ul></div>
+
+<div class="slide"><h1>Thank You</h1><p><strong>Smart Child Hub — Smart Child Daily Activity Tracking System</strong></p><p>Phase 7 · Final Delivery</p><p>Questions?</p></div>
+
+</div>
+
+<script>
+  var slides = document.querySelectorAll('.slide');
+  var idx = 0;
+  function show() {
+    slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+    document.getElementById('page').textContent = (idx + 1) + ' / ' + slides.length;
+  }
+  function nav(d) {
+    idx = Math.max(0, Math.min(slides.length - 1, idx + d));
+    show();
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ') nav(1);
+    else if (e.key === 'ArrowLeft') nav(-1);
+  });
+  show();
+</script>
+</body>
+</html>

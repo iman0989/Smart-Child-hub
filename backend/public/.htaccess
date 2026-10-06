@@ -1,0 +1,26 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Do not rewrite existing files or directories (e.g. static assets).
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Route everything else through the front controller.
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Never serve the configuration or source files directly.
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(sql|env|md)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    <IfModule mod_authz_host.c>
+        <FilesMatch "\.(sql|env|md)$">
+            Order allow,deny
+            Deny from all
+        </FilesMatch>
+    </IfModule>
+</IfModule>
